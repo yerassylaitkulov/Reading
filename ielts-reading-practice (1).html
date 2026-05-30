@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IELTS Reading Practice — The Step Pyramid of Djoser</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand: #f5f0e8;
+  --sand-dark: #ede6d6;
+  --stone: #c9b99a;
+  --stone-dark: #a09070;
+  --ink: #1e1a14;
+  --ink-soft: #3a3428;
+  --ink-muted: #7a7060;
+  --gold: #b8860b;
+  --gold-light: #d4a017;
+  --correct-bg: #e8f5e9;
+  --correct-border: #66bb6a;
+  --correct-text: #2e7d32;
+  --wrong-bg: #fce4ec;
+  --wrong-border: #ef5350;
+  --wrong-text: #b71c1c;
+  --radius: 8px;
+  --radius-sm: 5px;
+  --header-h: 52px;
+}
+
+html, body { height: 100%; overflow: hidden; font-family: 'DM Sans', sans-serif; background: var(--sand); color: var(--ink); }
+
+/* ══ LOGIN SCREEN ══ */
+#login-screen {
+  position: fixed; inset: 0; background: var(--sand);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 999;
+}
+.login-card {
+  background: #fff;
+  border: 1px solid var(--stone);
+  border-radius: 14px;
+  padding: 2.5rem 2.25rem 2rem;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 4px 32px rgba(30,26,20,0.10);
+}
+.login-card .logo {
+  font-family: 'Lora', serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.login-card .tagline {
+  font-size: 0.8rem;
+  color: var(--ink-muted);
+  margin-bottom: 2rem;
+}
+.login-card label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 6px;
+}
+.login-card input[type="text"] {
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  padding: 10px 14px;
+  border: 1px solid var(--stone);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  margin-bottom: 14px;
+}
+.login-card input[type="text"]:focus {
+  border-color: var(--gold-light);
+  box-shadow: 0 0 0 3px rgba(184,134,11,0.12);
+}
+.btn-login {
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 11px;
+  background: var(--gold);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.15s;
+  margin-bottom: 1.5rem;
+}
+.btn-login:hover { background: var(--gold-light); }
+.divider { border: none; border-top: 1px solid var(--sand-dark); margin-bottom: 1rem; }
+.prev-users-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+  margin-bottom: 8px;
+}
+.prev-users-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.prev-user-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.8rem;
+  padding: 5px 14px;
+  background: var(--sand);
+  border: 1px solid var(--stone);
+  border-radius: 20px;
+  cursor: pointer;
+  color: var(--ink);
+  transition: background 0.12s, border-color 0.12s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.prev-user-btn:hover { background: var(--sand-dark); border-color: var(--stone-dark); }
+.prev-user-btn .avatar {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.62rem;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+#login-error {
+  font-size: 0.78rem;
+  color: var(--wrong-text);
+  margin-top: -8px;
+  margin-bottom: 10px;
+  display: none;
+}
+
+/* ══ APP SHELL ══ */
+#app { display: none; flex-direction: column; height: 100%; }
+
+/* top bar */
+.topbar {
+  height: var(--header-h);
+  background: var(--ink);
+  color: var(--sand);
+  display: flex;
+  align-items: center;
+  padding: 0 1.25rem;
+  flex-shrink: 0;
+  gap: 12px;
+}
+.topbar h1 { font-family: 'Lora', serif; font-size: 0.95rem; font-weight: 600; flex-shrink: 0; }
+.topbar .dot { color: var(--stone-dark); }
+.user-badge {
+  display: flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 3px 12px 3px 5px;
+  flex-shrink: 0;
+}
+.user-badge .av {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 600;
+  display: flex; align-items: center; justify-content: center;
+}
+.user-badge .uname { font-size: 0.78rem; color: var(--sand); }
+.btn-switch {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.72rem;
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  color: var(--stone);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-switch:hover { border-color: rgba(255,255,255,0.4); color: var(--sand); }
+.attempt-pills { display: flex; gap: 5px; flex-wrap: wrap; margin-left: auto; }
+.pill {
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 3px 9px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.1);
+  color: var(--stone);
+  white-space: nowrap;
+}
+.pill.latest { background: var(--gold); color: #fff; }
+.autosave-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: #4caf50;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.autosave-dot.active { opacity: 1; }
+
+/* main split */
+.main { display: flex; flex: 1; overflow: hidden; }
+
+/* passage */
+.passage-pane {
+  width: 50%; border-right: 1.5px solid var(--stone);
+  overflow-y: auto; padding: 1.5rem 1.75rem;
+  background: #fff; flex-shrink: 0;
+}
+.passage-pane h2 { font-family: 'Lora', serif; font-size: 1.1rem; font-weight: 600; text-align: center; margin-bottom: 1.25rem; }
+.passage-pane p { font-family: 'Lora', serif; font-size: 0.88rem; line-height: 1.85; margin-bottom: 0.9rem; color: var(--ink-soft); }
+.para-label {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 21px; height: 21px;
+  font-weight: 700; font-family: 'DM Sans', sans-serif; font-size: 0.7rem;
+  color: var(--gold); background: #fdf3d0; border: 1px solid #e8c940;
+  border-radius: 4px; margin-right: 6px; vertical-align: middle; flex-shrink: 0;
+}
+
+/* questions */
+.questions-pane { flex: 1; overflow-y: auto; padding: 1.25rem 1.5rem 5.5rem; background: var(--sand); }
+
+.sec-label {
+  font-size: 0.67rem; font-weight: 600; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--ink-muted);
+  margin-bottom: 0.5rem; margin-top: 1.4rem;
+  padding-bottom: 5px; border-bottom: 1px solid var(--sand-dark);
+}
+.sec-label:first-child { margin-top: 0; }
+.sec-desc { font-size: 0.79rem; color: var(--ink-muted); margin-bottom: 0.8rem; line-height: 1.5; }
+
+.headings-ref {
+  background: #fff; border: 1px solid var(--stone);
+  border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 0.9rem;
+}
+.headings-ref .ref-title {
+  font-size: 0.67rem; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-muted); margin-bottom: 7px;
+}
+.headings-ref ul { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+.headings-ref li { font-size: 0.77rem; color: var(--ink-soft); display: flex; gap: 5px; line-height: 1.4; }
+.headings-ref li .hi { font-weight: 600; color: var(--gold); min-width: 24px; flex-shrink: 0; }
+
+.q-block {
+  background: #fff; border: 1px solid var(--stone);
+  border-radius: var(--radius); padding: 0.8rem 1rem; margin-bottom: 8px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.q-block.correct { background: var(--correct-bg); border-color: var(--correct-border); }
+.q-block.wrong   { background: var(--wrong-bg);   border-color: var(--wrong-border); }
+
+.q-num { font-size: 0.64rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--ink-muted); margin-bottom: 4px; }
+.q-text { font-family: 'Lora', serif; font-size: 0.85rem; line-height: 1.6; margin-bottom: 8px; }
+
+select, input[type="text"] {
+  font-family: 'DM Sans', sans-serif; font-size: 0.82rem;
+  padding: 7px 10px; border: 1px solid var(--stone);
+  border-radius: var(--radius-sm); background: #fff; color: var(--ink);
+  width: 100%; transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+}
+select:focus, input[type="text"]:focus {
+  border-color: var(--gold-light); box-shadow: 0 0 0 3px rgba(184,134,11,0.1);
+}
+select:disabled, input[type="text"]:disabled { background: #f0ece4; color: var(--ink-muted); cursor: not-allowed; }
+
+.feedback { font-size: 0.76rem; margin-top: 7px; color: var(--wrong-text); line-height: 1.5; }
+.feedback strong { font-weight: 600; }
+.hint-text { font-size: 0.71rem; color: var(--ink-muted); font-style: italic; margin-top: 2px; }
+
+.gap-input-wrap { display: inline-block; width: 120px; vertical-align: middle; margin: 0 3px; }
+.gap-input-wrap input { padding: 2px 7px; font-size: 0.82rem; }
+
+.multi-opts { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+.opt-btn {
+  display: flex; align-items: flex-start; gap: 8px;
+  font-family: 'DM Sans', sans-serif; font-size: 0.81rem;
+  padding: 7px 11px; border: 1px solid var(--stone);
+  border-radius: var(--radius-sm); cursor: pointer;
+  background: #fff; color: var(--ink); text-align: left;
+  transition: background 0.12s, border-color 0.12s; line-height: 1.45;
+}
+.opt-btn:hover:not(:disabled) { background: var(--sand); border-color: var(--stone-dark); }
+.opt-btn .opt-letter { font-weight: 600; color: var(--gold); min-width: 14px; flex-shrink: 0; }
+.opt-btn.selected    { border-color: var(--gold-light); background: #fdf3d0; }
+.opt-btn.correct-sel { border-color: var(--correct-border); background: var(--correct-bg); color: var(--correct-text); }
+.opt-btn.wrong-sel   { border-color: var(--wrong-border);   background: var(--wrong-bg);   color: var(--wrong-text); }
+.opt-btn.show-correct{ border-color: var(--correct-border); background: var(--correct-bg); color: var(--correct-text); }
+.opt-btn:disabled { cursor: default; }
+
+.action-bar {
+  position: fixed; bottom: 0; right: 0; width: 50%;
+  background: #fff; border-top: 1px solid var(--stone);
+  padding: 9px 1.5rem; display: flex; align-items: center; gap: 9px; z-index: 50;
+}
+.btn {
+  font-family: 'DM Sans', sans-serif; font-size: 0.81rem; font-weight: 500;
+  padding: 8px 18px; border-radius: var(--radius-sm); cursor: pointer;
+  border: 1px solid transparent; transition: opacity 0.15s, transform 0.1s;
+}
+.btn:active { transform: scale(0.97); }
+.btn-gold    { background: var(--gold);  color: #fff; border-color: var(--gold); }
+.btn-gold:hover { background: var(--gold-light); }
+.btn-outline { background: transparent; color: var(--ink); border-color: var(--stone-dark); }
+.btn-outline:hover { background: var(--sand-dark); }
+.score-toast {
+  display: none; font-size: 0.8rem; font-weight: 500; color: var(--ink-soft);
+  margin-left: auto; padding: 5px 13px; background: var(--sand-dark); border-radius: 20px;
+}
+
+.passage-pane::-webkit-scrollbar, .questions-pane::-webkit-scrollbar { width: 5px; }
+.passage-pane::-webkit-scrollbar-thumb, .questions-pane::-webkit-scrollbar-thumb { background: var(--stone); border-radius: 3px; }
+
+@media (max-width: 720px) {
+  html, body { height: auto; overflow: auto; }
+  .main { flex-direction: column; overflow: visible; }
+  .passage-pane { width: 100%; border-right: none; border-bottom: 2px solid var(--stone); overflow-y: visible; }
+  .questions-pane { overflow-y: visible; padding-bottom: 6rem; }
+  .action-bar { width: 100%; }
+  .headings-ref ul { grid-template-columns: 1fr; }
+  .attempt-pills { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="login-screen">
+  <div class="login-card">
+    <div class="logo">IELTS Reading Practice</div>
+    <div class="tagline">The Step Pyramid of Djoser &nbsp;·&nbsp; Academic Reading</div>
+
+    <label for="name-input">Your name</label>
+    <input type="text" id="name-input" placeholder="e.g. Aisha Karimova" autocomplete="off" maxlength="40"
+      onkeydown="if(event.key==='Enter') startSession()" oninput="clearLoginError()">
+    <div id="login-error">Please enter your name to continue.</div>
+    <button class="btn-login" onclick="startSession()">Start Practice →</button>
+
+    <hr class="divider">
+    <div class="prev-users-label" id="prev-label" style="display:none">Continue as</div>
+    <div class="prev-users-list" id="prev-users-list"></div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <header class="topbar">
+    <h1>IELTS Reading</h1>
+    <span class="dot">·</span>
+    <div class="user-badge">
+      <div class="av" id="topbar-av"></div>
+      <span class="uname" id="topbar-name"></span>
+    </div>
+    <button class="btn-switch" onclick="switchUser()">Switch user</button>
+    <div class="attempt-pills" id="attempt-pills"></div>
+    <div class="autosave-dot" id="autosave-dot" title="Autosaved"></div>
+  </header>
+
+  <div class="main">
+    <!-- LEFT: passage -->
+    <div class="passage-pane">
+      <h2>The Step Pyramid of Djoser</h2>
+      <p><span class="para-label">A</span>The pyramids are the most famous monuments of ancient Egypt and still hold enormous interest for people in the present day. These grand, impressive tributes to the memory of the Egyptian kings have become linked with the country even though other cultures, such as the Chinese and Mayan, also built pyramids. The evolution of the pyramid form has been written and argued about for centuries. However, there is no question that, as far as Egypt is concerned, it began with one monument to one king designed by one brilliant architect: the Step Pyramid of Djoser at Saqqara.</p>
+      <p><span class="para-label">B</span>Djoser was the first king of the Third Dynasty of Egypt and the first to build in stone. Prior to Djoser's reign, tombs were rectangular monuments made of dried clay brick, which covered underground passages where the deceased person was buried. For reasons which remain unclear, Djoser's main official, whose name was Imhotep, conceived of building a taller, more impressive tomb for his king by stacking stone slabs on top of one another, progressively making them smaller, to form the shape now known as the Step Pyramid. Djoser is thought to have reigned for 19 years, but some historians and scholars attribute a much longer time for his rule, owing to the number and size of the monuments he built.</p>
+      <p><span class="para-label">C</span>The Step Pyramid has been thoroughly examined and investigated over the last century, and it is now known that the building process went through many different stages. Historian Marc Van de Mieroop noted that much experimentation was involved, which is especially clear in the construction of the pyramid in the center of the complex. It had several plans before it became the first Step Pyramid in history, piling six levels on top of one another. The weight of the enormous mass was a challenge for the builders, who placed the stones at an inward incline in order to prevent the monument breaking up.</p>
+      <p><span class="para-label">D</span>When finally completed, the Step Pyramid rose 62 meters high and was the tallest structure of its time. The complex in which it was built was the size of a city in ancient Egypt and included a temple, courtyards, shrines, and living quarters for the priests. It covered a region of 16 hectares and was surrounded by a wall 10.5 meters high. The wall had 13 false doors cut into it with only one true entrance cut into the south-east corner; the entire wall was then ringed by a trench 750 meters long and 40 meters wide. The false doors and the trench were incorporated into the complex to discourage unwanted visitors. If someone wished to enter, he or she would have needed to know in advance how to find the location of the true opening in the wall. Djoser was so proud of his accomplishment that he broke the tradition of having only his own name on the monument and had Imhotep's name carved on it as well.</p>
+      <p><span class="para-label">E</span>The burial chamber of the tomb, where the king's body was laid to rest, was dug beneath the base of the pyramid, surrounded by a vast maze of long tunnels that had rooms off them to discourage robbers. One of the most mysterious discoveries found inside the pyramid was a large number of stone vessels. Over 40,000 of these vessels, of various forms and shapes, were discovered in storerooms off the pyramid's underground passages. They are inscribed with the names of rulers from the First and Second Dynasties of Egypt and made from different kinds of stone.</p>
+      <p><span class="para-label">F</span>There is no agreement among scholars and archaeologists on why the vessels were placed in the tomb of Djoser or what they were supposed to represent. The archaeologist Jean-Philippe Lauer, who excavated most of the pyramid and complex, believes they were originally stored and then given a proper burial by Djoser in his pyramid to honor his predecessors. There are other historians, however, who claim the vessels were dumped into the shafts as yet another attempt to prevent grave robbers from getting to the king's burial chamber. Unfortunately, all of the precautions and intricate design of the underground network did not prevent ancient robbers from finding a way in. Djoser's grave goods, and even his body, were stolen at some point in the past and all archaeologists found were a small number of his valuables overlooked by the thieves. There was enough left throughout the pyramid and its complex, however, to astonish and amaze the archaeologists who excavated it.</p>
+      <p><span class="para-label">G</span>Egyptologist Miroslav Verner writes that few monuments hold a place in human history as significant as that of the Step Pyramid in Saqqara. It can be said without exaggeration that this pyramid complex constitutes a milestone in the evolution of monumental stone architecture in Egypt and in the world as a whole. The Step Pyramid was a revolutionary advance in architecture and became the archetype which all the other great pyramid builders of Egypt would follow.</p>
+    </div>
+
+    <!-- RIGHT: questions -->
+    <div class="questions-pane">
+      <div class="sec-label">Questions 14–20 — List of Headings</div>
+      <p class="sec-desc">Choose the correct heading for each paragraph from the list below.</p>
+      <div class="headings-ref">
+        <div class="ref-title">List of Headings</div>
+        <ul>
+          <li><span class="hi">i</span> The areas and artefacts within the pyramid itself</li>
+          <li><span class="hi">ii</span> A difficult task for those involved</li>
+          <li><span class="hi">iii</span> A king who saved his people</li>
+          <li><span class="hi">iv</span> A single certainty among other less definite facts</li>
+          <li><span class="hi">v</span> An overview of the external buildings and areas</li>
+          <li><span class="hi">vi</span> A pyramid design that others copied</li>
+          <li><span class="hi">vii</span> An idea for changing the design of burial structures</li>
+          <li><span class="hi">viii</span> An incredible experience despite the few remains</li>
+          <li><span class="hi">ix</span> The answers to some unexpected questions</li>
+        </ul>
+      </div>
+      <div id="headings-qs"></div>
+
+      <div class="sec-label">Questions 21–24 — Gap Fill (ONE WORD ONLY)</div>
+      <p class="sec-desc">Choose ONE WORD ONLY from the passage for each answer.</p>
+      <div class="q-block" id="gblock-all">
+        <div class="q-num">Questions 21–24 · The Step Pyramid of Djoser</div>
+        <div id="gap-text"></div>
+      </div>
+
+      <div class="sec-label">Questions 25–26 — Multiple Choice</div>
+      <p class="sec-desc">Choose TWO letters, A–E.</p>
+      <div id="multi-qs"></div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn btn-gold" id="submit-btn" onclick="submitAnswers()">Check Answers</button>
+    <button class="btn btn-outline" id="retry-btn" style="display:none" onclick="retryWrong()">↺ Retry Incorrect</button>
+    <button class="btn btn-outline" id="new-btn"   style="display:none" onclick="newAttempt()">▷ New Attempt</button>
+    <span class="score-toast" id="score-toast"></span>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   DATA
+══════════════════════════════════════════ */
+const HEADINGS = [
+  {label:'i',   text:'The areas and artefacts within the pyramid itself'},
+  {label:'ii',  text:'A difficult task for those involved'},
+  {label:'iii', text:'A king who saved his people'},
+  {label:'iv',  text:'A single certainty among other less definite facts'},
+  {label:'v',   text:'An overview of the external buildings and areas'},
+  {label:'vi',  text:'A pyramid design that others copied'},
+  {label:'vii', text:'An idea for changing the design of burial structures'},
+  {label:'viii',text:'An incredible experience despite the few remains'},
+  {label:'ix',  text:'The answers to some unexpected questions'},
+];
+const HEADING_QS = [
+  {num:14,para:'A',answer:'iv'},
+  {num:15,para:'B',answer:'vii'},
+  {num:16,para:'C',answer:'ii'},
+  {num:17,para:'D',answer:'v'},
+  {num:18,para:'E',answer:'i'},
+  {num:19,para:'F',answer:'viii'},
+  {num:20,para:'G',answer:'vi'},
+];
+const GAP_QS = [
+  {num:21,answer:'city',    hint:'Paragraph D: "the size of a city in ancient Egypt"'},
+  {num:22,answer:'priests', hint:'Paragraph D: "living quarters for the priests"'},
+  {num:23,answer:'trench',  hint:'Paragraph D: "ringed by a trench 750 meters long"'},
+  {num:24,answer:'location',hint:'Paragraph D: "how to find the location of the true opening"'},
+];
+const MULTI_OPTS = [
+  {letter:'A',text:'Initially he had to be persuaded to build in stone rather than clay.'},
+  {letter:'B',text:'There is disagreement concerning the length of his reign.'},
+  {letter:'C',text:"He failed to appreciate Imhotep's part in the design of the Step Pyramid."},
+  {letter:'D',text:'A few of his possessions were still in his tomb when archaeologists found it.'},
+  {letter:'E',text:'He criticised the design and construction of other pyramids in Egypt.'},
+];
+const MULTI_ANSWERS = ['B','D'];
+const TOTAL = HEADING_QS.length + GAP_QS.length + 2; // 13
+
+/* ══════════════════════════════════════════
+   STORAGE HELPERS
+   Key schema:
+     ielts_users          → JSON array of names
+     ielts_{name}_state   → { submitted, headings:{14:val,...}, gaps:{21:val,...}, multi:[...], attempts:[...] }
+══════════════════════════════════════════ */
+function storageKey(name) { return 'ielts_' + name.toLowerCase().trim() + '_state'; }
+
+function loadUsers() {
+  try { return JSON.parse(localStorage.getItem('ielts_users') || '[]'); } catch(e){ return []; }
+}
+function saveUsers(list) { localStorage.setItem('ielts_users', JSON.stringify(list)); }
+
+function loadState(name) {
+  try {
+    const raw = localStorage.getItem(storageKey(name));
+    if (raw) return JSON.parse(raw);
+  } catch(e){}
+  return { submitted: false, headings:{}, gaps:{}, multi:[], attempts:[] };
+}
+function saveState(name, state) {
+  localStorage.setItem(storageKey(name), JSON.stringify(state));
+}
+
+/* ══════════════════════════════════════════
+   SESSION
+══════════════════════════════════════════ */
+let currentUser = null;
+let state = null;
+let autosaveTimer = null;
+
+function startSession() {
+  const raw = document.getElementById('name-input').value.trim();
+  if (!raw) { showLoginError(); return; }
+  const name = raw.charAt(0).toUpperCase() + raw.slice(1);
+
+  // register user
+  const users = loadUsers();
+  if (!users.includes(name)) { users.push(name); saveUsers(users); }
+
+  currentUser = name;
+  state = loadState(name);
+
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+
+  // topbar
+  document.getElementById('topbar-name').textContent = name;
+  document.getElementById('topbar-av').textContent = initials(name);
+
+  renderAll();
+  updatePills();
+}
+
+function switchUser() {
+  currentUser = null;
+  state = null;
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('name-input').value = '';
+  clearLoginError();
+  renderPrevUsers();
+  document.getElementById('name-input').focus();
+}
+
+function showLoginError() {
+  const el = document.getElementById('login-error');
+  el.style.display = 'block';
+}
+function clearLoginError() {
+  document.getElementById('login-error').style.display = 'none';
+}
+
+/* ══════════════════════════════════════════
+   AUTOSAVE
+══════════════════════════════════════════ */
+function scheduleAutosave() {
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(() => {
+    collectCurrentAnswers();
+    saveState(currentUser, state);
+    flashAutosave();
+  }, 600);
+}
+
+function collectCurrentAnswers() {
+  // headings
+  HEADING_QS.forEach(q => {
+    const el = document.getElementById('hsel-'+q.num);
+    if (el) state.headings[q.num] = el.value;
+  });
+  // gaps
+  GAP_QS.forEach(q => {
+    const el = document.getElementById('gap-'+q.num);
+    if (el) state.gaps[q.num] = el.value;
+  });
+  // multi (already kept in state.multi via toggleOpt)
+}
+
+function flashAutosave() {
+  const dot = document.getElementById('autosave-dot');
+  dot.classList.add('active');
+  setTimeout(() => dot.classList.remove('active'), 1200);
+}
+
+/* ══════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════ */
+function renderAll() {
+  renderHeadings();
+  renderGapBlock();
+  renderMulti();
+  if (state.submitted) applySubmittedUI();
+  syncActionBar();
+}
+
+function renderHeadings() {
+  document.getElementById('headings-qs').innerHTML = HEADING_QS.map(q => {
+    const saved = state.headings[q.num] || '';
+    const opts = HEADINGS.map(h =>
+      `<option value="${h.label}" ${saved===h.label?'selected':''}>${h.label}. ${h.text}</option>`
+    ).join('');
+    return `<div class="q-block" id="hq-${q.num}">
+      <div class="q-num">Question ${q.num}</div>
+      <div class="q-text">Paragraph <strong>${q.para}</strong></div>
+      <select id="hsel-${q.num}" onchange="scheduleAutosave()" ${state.submitted?'disabled':''}>
+        <option value="">— Select a heading —</option>${opts}
+      </select>
+      <div id="hfb-${q.num}" class="feedback"></div>
+    </div>`;
+  }).join('');
+}
+
+function renderGapBlock() {
+  const d = state.submitted ? 'disabled' : '';
+  const v = n => (state.gaps[n]||'').replace(/"/g,'&quot;');
+  document.getElementById('gap-text').innerHTML = `
+    <div style="font-family:'Lora',serif;font-size:0.88rem;line-height:2.4;color:var(--ink)">
+      The complex that includes the Step Pyramid and its surroundings is considered to be as big as an Egyptian
+      <span class="gap-input-wrap"><input type="text" id="gap-21" placeholder="21" value="${v(21)}" ${d} oninput="scheduleAutosave()"></span>
+      of the past. The area outside the pyramid included accommodation that was occupied by
+      <span class="gap-input-wrap"><input type="text" id="gap-22" placeholder="22" value="${v(22)}" ${d} oninput="scheduleAutosave()"></span>,
+      along with many other buildings and features.
+      <br><br>
+      A wall ran around the outside of the complex and a number of false entrances were built into this.
+      In addition, a long
+      <span class="gap-input-wrap"><input type="text" id="gap-23" placeholder="23" value="${v(23)}" ${d} oninput="scheduleAutosave()"></span>
+      encircled the wall. As a result, any visitors who had not been invited were cleverly prevented from entering the pyramid grounds unless they knew the
+      <span class="gap-input-wrap"><input type="text" id="gap-24" placeholder="24" value="${v(24)}" ${d} oninput="scheduleAutosave()"></span>
+      of the real entrance.
+    </div>
+    <div id="gfb-all" class="feedback" style="margin-top:8px"></div>`;
+}
+
+function renderMulti() {
+  const opts = MULTI_OPTS.map(o => {
+    const sel = state.multi.includes(o.letter);
+    return `<button class="opt-btn${sel?' selected':''}" id="mopt-${o.letter}"
+      onclick="toggleOpt('${o.letter}')" ${state.submitted?'disabled':''}>
+      <span class="opt-letter">${o.letter}</span>${o.text}
+    </button>`;
+  }).join('');
+  document.getElementById('multi-qs').innerHTML = `
+    <div class="q-block" id="mq-2526">
+      <div class="q-num">Questions 25–26</div>
+      <div class="q-text">Which TWO of the following points does the writer make about King Djoser?</div>
+      <div class="multi-opts">${opts}</div>
+      <div id="mfb-2526" class="feedback"></div>
+    </div>`;
+}
+
+function applySubmittedUI() {
+  // headings feedback
+  HEADING_QS.forEach(q => {
+    const val = state.headings[q.num] || '';
+    const ok = val === q.answer;
+    const block = document.getElementById('hq-'+q.num);
+    if (block) block.classList.add(ok?'correct':'wrong');
+    const fb = document.getElementById('hfb-'+q.num);
+    if (fb && !ok) {
+      const ch = HEADINGS.find(h=>h.label===q.answer);
+      fb.innerHTML = `Correct: <strong>${q.answer}. ${ch?ch.text:''}</strong>`;
+    }
+  });
+  // gap feedback
+  let gfb = [];
+  GAP_QS.forEach(q => {
+    const val = (state.gaps[q.num]||'').trim().toLowerCase();
+    const ok = val === q.answer;
+    if (!ok) gfb.push(`<strong>Q${q.num}:</strong> Correct answer: <strong>${q.answer}</strong> <span class="hint-text">— ${q.hint}</span>`);
+  });
+  const allGapOk = GAP_QS.every(q=>(state.gaps[q.num]||'').trim().toLowerCase()===q.answer);
+  const gb = document.getElementById('gblock-all');
+  if (gb) gb.classList.add(allGapOk?'correct':'wrong');
+  const gfball = document.getElementById('gfb-all');
+  if (gfball && gfb.length) gfball.innerHTML = gfb.join('<br>');
+  // multi feedback
+  const hits = state.multi.filter(l=>MULTI_ANSWERS.includes(l)).length;
+  MULTI_OPTS.forEach(o => {
+    const btn = document.getElementById('mopt-'+o.letter);
+    if (!btn) return;
+    const isC = MULTI_ANSWERS.includes(o.letter);
+    const isS = state.multi.includes(o.letter);
+    if (isC&&isS)  btn.className='opt-btn correct-sel';
+    else if (!isC&&isS) btn.className='opt-btn wrong-sel';
+    else if (isC&&!isS) btn.className='opt-btn show-correct';
+    else btn.className='opt-btn';
+  });
+  const mb = document.getElementById('mq-2526');
+  if (mb) mb.classList.add(hits===2?'correct':'wrong');
+  const mfb = document.getElementById('mfb-2526');
+  if (mfb && hits<2) mfb.innerHTML = `Correct answers: <strong>B and D</strong>`;
+  // score toast
+  showToast();
+}
+
+function syncActionBar() {
+  document.getElementById('submit-btn').style.display = state.submitted ? 'none' : 'inline-block';
+  document.getElementById('retry-btn').style.display  = state.submitted ? 'inline-block' : 'none';
+  document.getElementById('new-btn').style.display    = state.submitted ? 'inline-block' : 'none';
+  if (state.submitted) showToast(); else hideToast();
+}
+
+function showToast() {
+  const last = state.attempts[state.attempts.length-1];
+  if (!last) return;
+  const t = document.getElementById('score-toast');
+  t.textContent = last.score + '/' + last.total + ' correct';
+  t.style.display = 'inline-block';
+}
+function hideToast() {
+  document.getElementById('score-toast').style.display = 'none';
+}
+
+/* ══════════════════════════════════════════
+   TOGGLE MULTI
+══════════════════════════════════════════ */
+function toggleOpt(letter) {
+  if (state.submitted) return;
+  if (state.multi.includes(letter)) {
+    state.multi = state.multi.filter(l=>l!==letter);
+  } else {
+    if (state.multi.length >= 2) return;
+    state.multi.push(letter);
+  }
+  MULTI_OPTS.forEach(o => {
+    const btn = document.getElementById('mopt-'+o.letter);
+    if (btn) btn.className = 'opt-btn'+(state.multi.includes(o.letter)?' selected':'');
+  });
+  scheduleAutosave();
+}
+
+/* ══════════════════════════════════════════
+   SUBMIT
+══════════════════════════════════════════ */
+function submitAnswers() {
+  collectCurrentAnswers();
+  state.submitted = true;
+
+  let correct = 0;
+  HEADING_QS.forEach(q => { if ((state.headings[q.num]||'')===q.answer) correct++; });
+  GAP_QS.forEach(q => { if ((state.gaps[q.num]||'').trim().toLowerCase()===q.answer) correct++; });
+  correct += state.multi.filter(l=>MULTI_ANSWERS.includes(l)).length;
+
+  state.attempts.push({ n: state.attempts.length+1, score: correct, total: TOTAL, time: new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}) });
+  saveState(currentUser, state);
+
+  applySubmittedUI();
+  syncActionBar();
+  updatePills();
+}
+
+/* ══════════════════════════════════════════
+   RETRY / NEW ATTEMPT
+══════════════════════════════════════════ */
+function retryWrong() {
+  // clear only wrong heading selects
+  HEADING_QS.forEach(q => {
+    if ((state.headings[q.num]||'') !== q.answer) {
+      state.headings[q.num] = '';
+    }
+  });
+  // clear only wrong gaps
+  GAP_QS.forEach(q => {
+    if ((state.gaps[q.num]||'').trim().toLowerCase() !== q.answer) {
+      state.gaps[q.num] = '';
+    }
+  });
+  // clear wrong multi selections
+  state.multi = state.multi.filter(l=>MULTI_ANSWERS.includes(l));
+  state.submitted = false;
+  saveState(currentUser, state);
+  renderAll();
+}
+
+function newAttempt() {
+  state.headings = {};
+  state.gaps = {};
+  state.multi = [];
+  state.submitted = false;
+  saveState(currentUser, state);
+  renderAll();
+}
+
+/* ══════════════════════════════════════════
+   ATTEMPT PILLS
+══════════════════════════════════════════ */
+function updatePills() {
+  const wrap = document.getElementById('attempt-pills');
+  if (!state || !state.attempts.length) { wrap.innerHTML=''; return; }
+  wrap.innerHTML = state.attempts.map((a,i) => {
+    const cls = i===state.attempts.length-1 ? 'pill latest' : 'pill';
+    return `<span class="${cls}">${ordinal(a.n)}: ${a.score}/${a.total}</span>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════
+   PREVIOUS USERS on login screen
+══════════════════════════════════════════ */
+function renderPrevUsers() {
+  const users = loadUsers();
+  const label = document.getElementById('prev-label');
+  const list  = document.getElementById('prev-users-list');
+  if (!users.length) { label.style.display='none'; list.innerHTML=''; return; }
+  label.style.display='block';
+  list.innerHTML = users.map(u => `
+    <button class="prev-user-btn" onclick="quickLogin('${u.replace(/'/g,"\\'")}')">
+      <span class="avatar">${initials(u)}</span>${u}
+    </button>`).join('');
+}
+
+function quickLogin(name) {
+  document.getElementById('name-input').value = name;
+  startSession();
+}
+
+/* ══════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════ */
+function initials(name) {
+  return name.trim().split(/\s+/).map(w=>w[0]).join('').toUpperCase().slice(0,2);
+}
+function ordinal(n) {
+  const s=['th','st','nd','rd'], v=n%100;
+  return n+(s[(v-20)%10]||s[v]||s[0]);
+}
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+renderPrevUsers();
+document.getElementById('name-input').focus();
+</script>
+</body>
+</html>
